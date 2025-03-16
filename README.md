@@ -1,7 +1,3 @@
-Here’s a **README.md** file for your **AI PDF Chatbot** project:
-
----
-
 # 📄 AI PDF Chatbot
 
 This is an AI-powered chatbot that allows users to upload PDF documents and ask questions about the content. The chatbot extracts text from the PDF, creates a vector store using **FAISS**, and generates responses using **OpenAI GPT** models.
