@@ -144,9 +144,4 @@ Developed by **Rohan Jain**. Contributions are welcome! Feel free to fork and im
 
 ---
 
-## 📝 License
-This project is open-source and available under the **MIT License**.
 
----
-
-This **README.md** provides a **comprehensive overview** of your AI PDF Chatbot project, including **installation, usage, troubleshooting, and future improvements**. 🚀 Let me know if you need modifications!
