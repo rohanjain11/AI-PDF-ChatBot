@@ -1,5 +1,6 @@
 import os
 from functools import lru_cache
+from typing import List
 
 from pydantic_settings import BaseSettings
 from pydantic import Field
@@ -12,7 +13,7 @@ class Settings(BaseSettings):
     openai_model: str = Field("gpt-4-turbo", alias="OPENAI_MODEL")
 
     # Backend URLs / CORS
-    allowed_origins: list[str] = Field(
+    allowed_origins: List[str] = Field(
         default_factory=lambda:[
         "http://localhost:3000",
         "http://localhost:3001",

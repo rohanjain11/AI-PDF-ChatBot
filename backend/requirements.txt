@@ -12,4 +12,4 @@ langchain-openai==0.3.35
 langchain-community==0.3.31
 openai==2.24.0
 pydantic-settings==2.11.0
-python-multipart
+python-multipart>=0.0.9
