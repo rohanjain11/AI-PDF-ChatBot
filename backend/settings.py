@@ -16,6 +16,8 @@ class Settings(BaseSettings):
         default_factory=lambda:[
         "http://localhost:3000",
         "http://localhost:3001",
+        "https://ai-pdf-chatbot.vercel.app",
+        "https://ai-pdf-chatbot-rohanjain11.vercel.app",
     ],
         alias="ALLOWED_ORIGINS",
     )

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8001";
+const API_URL = process.env.REACT_APP_API_URL || "https://pdf-chatbot-api-9zrk.onrender.com";
 
 export async function uploadPDF(file) {
   const formData = new FormData();
