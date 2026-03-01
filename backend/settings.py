@@ -14,12 +14,13 @@ class Settings(BaseSettings):
 
     # Backend URLs / CORS
     allowed_origins: List[str] = Field(
-        default_factory=lambda:[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://ai-pdf-chatbot.vercel.app",
-        "https://ai-pdf-chatbot-rohanjain11.vercel.app",
-    ],
+        default_factory=lambda: [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "https://ai-pdf-chatbot.vercel.app",
+            "https://ai-pdf-chatbot-rohanjain11.vercel.app",
+            "https://ai-pdf-chatbot-zeta.vercel.app",
+        ],
         alias="ALLOWED_ORIGINS",
     )
 
