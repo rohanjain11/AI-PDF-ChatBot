@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { TailSpin } from "react-loader-spinner";
 import { uploadPDF } from "../api";
 import ErrorMessage from "./ErrorMessage";
 
@@ -125,11 +124,7 @@ const FileUpload = ({ onUploadSuccess }) => {
       {selectedFile && !uploaded && !loading && (
         <div className="upload-actions">
           <button className="btn-upload" onClick={handleUpload} disabled={loading}>
-            {loading ? (
-              <TailSpin height="16" width="16" color="#fff" ariaLabel="loading" />
-            ) : (
-              "Upload & Process"
-            )}
+            {loading ? "Processing…" : "Upload & Process"}
           </button>
         </div>
       )}
