@@ -35,8 +35,11 @@ AI-PDF-CHATBOT/
 │   ├── main.py              # FastAPI backend logic
 │   ├── pdf_processing.py    # PDF text extraction logic
 │   ├── vector_store.py      # FAISS vector storage and retrieval
+│   ├── settings.py          # Centralized configuration (env-based)
 │   ├── uploads/             # Directory to store uploaded PDFs
-│   ├── .env                 # API keys and environment variables
+│   ├── cache/               # Directory to store cached embeddings
+│   ├── .env                 # API keys and environment variables (not committed)
+│   ├── .env.example         # Example backend environment variables
 │   ├── venv/                # Virtual environment (ignored in Git)
 │
 │── frontend/
@@ -44,11 +47,12 @@ AI-PDF-CHATBOT/
 │   │   ├── components/
 │   │   │   ├── FileUpload.js  # Component to upload PDF
 │   │   │   ├── Chat.js        # Component for asking questions
+│   │   │   ├── ErrorMessage.js# Shared error display component
 │   │   ├── App.js             # Main React app logic
-│   │   ├── App.css            # Styling for UI
+│   │   ├── styles/App.css     # Styling for UI
 │   ├── public/
 │   ├── package.json           # Frontend dependencies
-│   ├── .env                   # Frontend environment variables
+│   ├── .env.example           # Example frontend environment variables
 │
 │── README.md                 # Project documentation
 │── requirements.txt           # Python dependencies
@@ -75,15 +79,22 @@ AI-PDF-CHATBOT/
    ```bash
    pip install -r requirements.txt
    ```
-4. Set up your **.env** file:
+4. Set up your **.env** file (based on `.env.example`):
+   ```bash
+   cp .env.example .env
+   # Then edit .env to include your real values
    ```
-   OPENAI_API_KEY=your-openai-api-key
-   ```
-5. Run the FastAPI server:
+5. Run the FastAPI server (development):
    ```bash
    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
-6. Visit **http://127.0.0.1:8000/docs** to test the API.
+6. Visit **http://127.0.0.1:8000/docs** to test the API, or **http://127.0.0.1:8000/health** for a simple health check.
+
+For a production-style run (no auto-reload), you can omit the `--reload` flag:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
 
 ---
 
@@ -96,11 +107,35 @@ AI-PDF-CHATBOT/
    ```bash
    npm install
    ```
-3. Start the React app:
+3. (Optional) Create a `.env` file from the example to point to a non-local backend:
+   ```bash
+   cd src/..
+   cp .env.example .env
+   # REACT_APP_API_URL defaults to http://localhost:8000 if not set
+   ```
+4. Start the React app:
    ```bash
    npm start
    ```
-4. Open **http://localhost:3000** in your browser.
+5. Open **http://localhost:3000** in your browser.
+
+### Environment Variables
+
+Backend (`backend/.env` based on `backend/.env.example`):
+
+- `OPENAI_API_KEY` – your OpenAI API key (required).
+- `OPENAI_MODEL` – OpenAI model name to use (default: `gpt-4-turbo`).
+- `ALLOWED_ORIGINS` – comma-separated list of allowed frontend origins for CORS (default includes `http://localhost:3000`).
+- `UPLOAD_DIR` – directory for uploaded PDFs (default: `uploads`).
+- `CACHE_DIR` – directory for cached embeddings (default: `cache`).
+- `MAX_PDF_SIZE_MB` – maximum allowed PDF size in megabytes (default: `20`).
+- `MAX_PDF_PAGES` – maximum number of pages to process (default: `200`).
+- `FAISS_K` – number of chunks to retrieve from FAISS (default: `5`).
+- `CONTEXT_MAX_CHARS` – maximum number of characters of context sent to the language model (default: `8000`).
+
+Frontend (`frontend/.env` based on `frontend/.env.example`):
+
+- `REACT_APP_API_URL` – base URL of the backend API (default: `http://localhost:8000`).
 
 ---
 

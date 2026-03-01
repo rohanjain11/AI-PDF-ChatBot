@@ -1,68 +1,140 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { TailSpin } from 'react-loader-spinner';
+import React, { useRef, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
+import { uploadPDF } from "../api";
+import ErrorMessage from "./ErrorMessage";
 
-const FileUpload = () => {
+const FileUpload = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [uploaded, setUploaded] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [error, setError] = useState("");
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    if (!file) return;
 
-    if (file && file.type !== 'application/pdf') {
-      setMessage('Only PDF files are allowed.');
+    if (file.type !== "application/pdf") {
+      setError("Only PDF files are allowed.");
       setSelectedFile(null);
+      setStatusMessage("");
       return;
     }
 
     setSelectedFile(file);
-    setMessage('');
+    setUploaded(false);
+    setError("");
+    setStatusMessage("");
+  };
+
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setMessage('Please select a valid PDF file first.');
+      setError("Please select a PDF file first.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
     setLoading(true);
+    setError("");
+    setStatusMessage("");
 
     try {
-      const response = await axios.post('http://localhost:8000/upload-pdf/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const data = await uploadPDF(selectedFile);
+      const cachedNote = data?.cached ? " (cached)" : "";
+      setStatusMessage(`Ready${cachedNote}`);
+      setUploaded(true);
 
-      if (response.status === 200) {
-        setMessage('PDF uploaded successfully!');
-      } else {
-        setMessage('File upload failed.');
+      if (onUploadSuccess) {
+        onUploadSuccess(selectedFile.name);
       }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      setMessage('An error occurred during file upload.');
+    } catch (err) {
+      console.error("Upload error:", err);
+      let message;
+      if (err.code === "ERR_NETWORK" || !err.response) {
+        message = "Cannot reach the server. Is the backend running?";
+      } else {
+        const data = err.response.data;
+        if (typeof data === "string") {
+          message = `Server error (${err.response.status}).`;
+        } else if (data && typeof data.detail === "string") {
+          message = data.detail;
+        } else if (data && Array.isArray(data.detail) && data.detail.length) {
+          message = data.detail[0].msg || String(data.detail[0]);
+        } else {
+          message = `Upload failed (${err.response.status}).`;
+        }
+      }
+      setError(message);
+      setUploaded(false);
     } finally {
       setLoading(false);
     }
   };
 
+  const dropzoneClass = [
+    "upload-dropzone",
+    uploaded ? "uploaded" : "",
+    loading ? "uploading" : "",
+    selectedFile && !uploaded && !loading ? "has-file" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="file-upload-container">
-    {/* <h2>Upload PDF</h2> */}
-      <input type="file" accept="application/pdf" onChange={handleFileChange} className="file-input" />
-      <button onClick={handleUpload} className="upload-btn" disabled={loading}>
-        {loading ? (
-          <TailSpin height="20" width="20" color="#ffffff" ariaLabel="loading" />
-        ) : (
-          'Upload PDF'
-        )}
-      </button>
-      {message && <p className="upload-message">{message}</p>}
+    <div className="upload-panel">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        onChange={handleFileChange}
+        className="upload-hidden-input"
+      />
+
+      <div className={dropzoneClass} onClick={openFilePicker}>
+        <div className="dropzone-icon">
+          {uploaded ? "✅" : loading ? "⏳" : "📎"}
+        </div>
+        <div className="dropzone-text">
+          {!selectedFile && (
+            <>
+              <strong>Click to choose a PDF</strong>
+              <br />
+              or drag and drop your file here
+            </>
+          )}
+          {selectedFile && !uploaded && !loading && (
+            <span className="dropzone-filename">📄 {selectedFile.name}</span>
+          )}
+          {selectedFile && uploaded && (
+            <>
+              <span className="dropzone-filename">📄 {selectedFile.name}</span>
+              <br />
+              <span style={{ color: "#4ade80", fontSize: 13 }}>
+                {statusMessage || "Uploaded"}
+              </span>
+            </>
+          )}
+          {loading && <strong>Processing document...</strong>}
+        </div>
+      </div>
+
+      {selectedFile && !uploaded && !loading && (
+        <div className="upload-actions">
+          <button className="btn-upload" onClick={handleUpload} disabled={loading}>
+            {loading ? (
+              <TailSpin height="16" width="16" color="#fff" ariaLabel="loading" />
+            ) : (
+              "Upload & Process"
+            )}
+          </button>
+        </div>
+      )}
+
+      <ErrorMessage message={error} />
     </div>
   );
 };

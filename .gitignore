@@ -31,3 +31,7 @@ logs/
 
 # OS-specific files
 Thumbs.db
+
+# Uploaded PDFs and cached embeddings
+backend/uploads/
+backend/cache/

@@ -1,11 +1,22 @@
 import faiss
 import numpy as np
-from langchain.text_splitter import RecursiveCharacterTextSplitter  # ✅ Correct Import
-from langchain_openai import OpenAIEmbeddings  # ✅ Ensure this import is correct
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
 
-def create_vector_store(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=700, chunk_overlap=100)
+from settings import get_settings
+
+settings = get_settings()
+
+
+def create_vector_store(text: str):
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=700,
+        chunk_overlap=100,
+    )
     chunks = text_splitter.split_text(text)
+
+    if not chunks:
+        return None, []
 
     embeddings = OpenAIEmbeddings()
     vectors = embeddings.embed_documents(chunks)
